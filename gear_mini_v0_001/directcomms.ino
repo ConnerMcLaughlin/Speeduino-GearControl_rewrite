@@ -36,9 +36,9 @@ void direct_serial_command()
           case 'E': // receive command button commands
                   byte Etmp;
                   uint16_t Eoffset;
-                  while (Serial.available() == 0) {}
+                  while (!Serial.available());
                   Etmp = Serial.read();
-                  while (Serial.available() == 0) {}
+                  while (Serial.available());
                   Eoffset = word(Serial.read(), Etmp);
                   commandButtons(Eoffset);
           break;
@@ -49,23 +49,21 @@ void direct_serial_command()
 
           case 'P': // set the current page
                     //A 2nd byte of data is required after the 'P' specifying the new page number.
-                  while (Serial.available() == 0) {}
+                  while (Serial.available());
                   //if (Serial.available() == 0) { return; }
                   currentStatus.currentPage = Serial.read();
-                  if (currentStatus.currentPage >= '0') {//This converts the ascii number char into binary
-                  currentStatus.currentPage -= '0';
-                  }
+                  if (currentStatus.currentPage >= '0')//This converts the ascii number char into binary
+                     currentStatus.currentPage -= '0';
+                  
           break;
       
           case 'Q': // send code version
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                        {
+                    for (uint16_t sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
                         Serial.write(simple_remote_signature[sg]);  
-                        }
           break;
           
           case 'S': // send code version
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                    for (uint16_t sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
                         {
                         Serial.write(simple_remote_RevNum[sg]);
                         currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
@@ -77,14 +75,14 @@ void direct_serial_command()
           break;
 
           case 'W': // receive new VE obr constant at 'W'+<offset>+<newbyte>
-                while (Serial.available() == 0) {}
+                while (!Serial.available());
                 byte Wtmp;
                 uint16_t Woffset;
-                while (Serial.available() == 0) {}
+                while (!Serial.available());
                 Wtmp = Serial.read();
-                while (Serial.available() == 0) {}
+                while (!Serial.available());
                 Woffset = word(Serial.read(), Wtmp);
-                while (Serial.available() == 0) {}
+                while (!Serial.available());
                 direct_receiveValue(Woffset, Serial.read());
           break;
      
@@ -93,24 +91,25 @@ void direct_serial_command()
                 byte tsCanId_sent;         
                 uint16_t offset, length;
                 byte tmp;
-                while (Serial.available() == 0) {}
+                while (!Serial.available());
                 tsCanId_sent = Serial.read(); //Read the $tsCanId
-                while (Serial.available() == 0) {}
+                while (!Serial.available());
                 cmd = Serial.read();
-                      while (Serial.available() == 0) {}
-                      tmp = Serial.read();
-                      while (Serial.available() == 0) {}
-                      offset = word(Serial.read(), tmp);
-                      while (Serial.available() == 0) {}
-                      tmp = Serial.read();
-                      if (cmd != 87)          //if is "W" only 1 more byte is sent
-                      {
-                      while (Serial.available() == 0) {}
-                      length = word(Serial.read(), tmp); 
-                      }
-                      else{length = tmp;}
+                while (!Serial.available());
+                tmp = Serial.read();
+                while (!Serial.available());
+                offset = word(Serial.read(), tmp);
+                while (!Serial.available());
+                tmp = Serial.read();
+                if (cmd != 87)          //if is "W" only 1 more byte is sent
+                {
+                    while (!Serial.available());
+                    length = word(Serial.read(), tmp); 
+                }
+                else
+                    length = tmp;
                       
-                      dodirect_rCommands(cmd,tsCanId_sent,offset,length);
+                dodirect_rCommands(cmd,tsCanId_sent,offset,length);
                 
           break;
     }
@@ -118,21 +117,19 @@ void direct_serial_command()
 return;
  
 }
-void dodirect_rCommands(uint8_t commandletter, uint8_t canid, uint16_t cmdoffset, uint16_t cmdlength)
+void dodirect_rCommands(byte commandletter, byte canid, uint16_t cmdoffset, uint16_t cmdlength)
 {
   
     switch (commandletter)
            {
            case 15:    //
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
-                        {
+                    for (uint16_t sg = 0; sg < sizeof(simple_remote_signature) - 1; sg++)
                         Serial.write(simple_remote_signature[sg]);  
                         // Serial.write(simple_remote_signature[sg]);
-                        }  
            break;
                         
            case 14:  //
-                    for (unsigned int sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
+                    for (uint16_t sg = 0; sg < sizeof(simple_remote_RevNum) - 1; sg++)
                         {
                         Serial.write(simple_remote_RevNum[sg]);
                         currentStatus.secl = 0; //This is required in TS3 due to its stricter timings
@@ -166,18 +163,18 @@ void dodirect_rCommands(uint8_t commandletter, uint8_t canid, uint16_t cmdoffset
            break;
                     
            case 87:  //r version of W
-                 // int valueOffset; //cannot use offset as a variable name, it is a reserved word for several teensy libraries
+                 // int16_t valueOffset; //cannot use offset as a variable name, it is a reserved word for several teensy libraries
                   direct_receiveValue(cmdoffset, cmdlength);  //Serial.read());                    
            break;
        } //closes the switch/case 
 }
 
-void direct_sendTheCommand(uint8_t commandletter, uint8_t canid, uint16_t cmdoffset, uint16_t cmdlength)
+void direct_sendTheCommand(byte commandletter, byte canid, uint16_t cmdoffset, uint16_t cmdlength)
 {
 
 }
 
-void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
+void direct_receiveValue(uint16_t rvOffset, byte newValue)
 {      
         
   void* pnt_configPage;//This only stores the address of the value that it's pointing to and not the max size
@@ -189,18 +186,14 @@ void direct_receiveValue(uint16_t rvOffset, uint8_t newValue)
       pnt_configPage = &configPage1; //Setup a pointer to the relevant config page
      //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
       if ( rvOffset < page_1_size)
-      {
-        *((uint8_t *)pnt_configPage + (uint8_t)rvOffset) = newValue; //
-      }
+        *((byte *)pnt_configPage + (byte)rvOffset) = newValue; //
       break;
 
     case 2: //port editor config Page:
       pnt_configPage = &configPage2; //Setup a pointer to the relevant config page
      //For some reason, TunerStudio is sending offsets greater than the maximum page size. I'm not sure if it's their bug or mine, but the fix is to only update the config page if the offset is less than the maximum size
       if ( rvOffset < page_2_size)
-      {
-        *((uint8_t *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
-      }
+        *((byte *)pnt_configPage + (uint16_t)rvOffset) = newValue; //
       break;
   
   }
@@ -224,32 +217,32 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
           {
 
             case simple_remote_setupPage:  //veSetPage:
-                {
                 // currentTitleIndex = 27;
 
                 pnt_configPage = &configPage1; //Create a pointer to Page 1 in memory  
-                  send_page_Length = page_1_size; 
-                }
+                send_page_Length = page_1_size; 
             break;  
 
             case port_editor_config:  //port editor config Page:
-                {
                 // currentTitleIndex = 27;
 
                 pnt_configPage = &configPage2; //Create a pointer to Page 2 in memory  
-                  send_page_Length = page_2_size; 
-                }
+                send_page_Length = page_2_size; 
             break;
+
+            default:
+                // currentTitleIndex = 27;
+
+                pnt_configPage = &configPage1; //Create a pointer to Page 1 in memory  
+                send_page_Length = page_1_size; 
 
           }
     
           //All other bytes can simply be copied from the config table
           
-          uint8_t response[send_page_Length];
+          byte response[send_page_Length];
           for ( uint16_t x = 0; x < send_page_Length; x++)
-            {
-              response[x] = *((uint8_t *)pnt_configPage + (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
-            }
+              response[x] = *((byte *)pnt_configPage + (uint16_t)(x)); //Each byte is simply the location in memory of the configPage + the offset(not used) + the variable number (x)
 
           if (cmd == 206)   //came via passthrough from serial3
             {
@@ -260,12 +253,10 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
               SERIALLink.write(zero);                       // dummy offset msb
               SERIALLink.write(lowByte(send_page_Length));  // length lsb
               SERIALLink.write(highByte(send_page_Length)); // length msb
-              SERIALLink.write((uint8_t *)&response, sizeof(response));          
+              SERIALLink.write((byte *)&response, sizeof(response));          
             }
           else
-          {  
-          Serial.write((uint8_t *)&response, sizeof(response));
-          }
+              Serial.write((byte *)&response, sizeof(response));
       
 }
 /*
@@ -276,13 +267,14 @@ void direct_receiveCalibration(byte tableID)
 
 }
 
-void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
+void direct_sendValues(uint16_t offset, uint16_t packetLength, byte cmd)
 {
   
   byte fullStatus[direct_packetSize];
   byte response[packetLength];
 
-    if(direct_requestCount == 0) { currentStatus.secl = 0; }
+    if(direct_requestCount == 0)
+       currentStatus.secl = 0;
     direct_requestCount++;
 
   fullStatus[0] = currentStatus.secl; //secl is simply a counter that increments each second. Used to track unexpected resets (Which will reset this count to 0)
@@ -342,16 +334,12 @@ void direct_sendValues(uint16_t offset, uint16_t packetLength, uint8_t cmd)
   fullStatus[52] = lowByte(currentStatus.Analog[16]);
   fullStatus[53] = highByte(currentStatus.Analog[16]);    
  
-    for(byte x=0; x<packetLength; x++)
-  {
+  for(byte x=0; x<packetLength; x++)
     response[x] = fullStatus[offset+x];
-  }
 
   if (cmd == 60)
-    {
       Serial.write(response, (size_t)packetLength); 
       //Serial.write(response, (size_t)packetLength);
-    }
   else if (cmd == 180)
     {
       //Serial.print("r was sent");
@@ -384,94 +372,26 @@ void commandButtons(uint16_t cmdCombined)
       BIT_SET(currentStatus.testIO_hardware, 1);  //set testactive flag (bit 1)
       break;
           
-    case 513:
-    case 514:
-    case 515:
-    case 516:
-    case 517:
-    case 518:
-    case 519:
-    case 520:
-    case 521:
-    case 522:
-    case 523:
-    case 524:
-    case 525:
-    case 526:
-    case 527:
-    case 528: // cmd group is on actions
+    case 513 ... 528: // cmd group is on actions
       if(BIT_CHECK(currentStatus.testIO_hardware, 1))
-        {
           BIT_SET(currentStatus.digOut, (cmdCombined-513));
-        }
       break;
       
-    case 769: // cmd group is off actions
-    case 770:
-    case 771:
-    case 772:
-    case 773:
-    case 774:
-    case 775:
-    case 776:
-    case 777:
-    case 778:
-    case 779:
-    case 780:
-    case 781:
-    case 782:
-    case 783:
-    case 784:
+    case 769 ... 784: // cmd group is off actions
       if(BIT_CHECK(currentStatus.testIO_hardware, 1))
-        {
           BIT_CLEAR(currentStatus.digOut, (cmdCombined-769));
-        }
       break;
 
-    case 1537:
-    case 1538:
-    case 1539:
-    case 1540:
-    case 1541:
-    case 1542:
-    case 1543:
-    case 1544:
-    case 1545:
-    case 1546:
-    case 1547:
-    case 1548:
-    case 1549:
-    case 1550:
-    case 1551:
-    case 1552: // cmd group is on actions
+    case 1537 ... 1552: // cmd group is on actions
       if(BIT_CHECK(currentStatus.testIO_hardware, 1))
-        {
           BIT_SET(currentStatus.digIn, (cmdCombined-1537));
-        }
         // currentStatus.dev1 = BIT_CHECK(currentStatus.digIn, (cmdCombined-1537));
         // currentStatus.dev2 = BIT_CHECK(currentStatus.testIO_hardware, 1);
       break;
       
-    case 1793: // cmd group is off actions
-    case 1794:
-    case 1795:
-    case 1796:
-    case 1797:
-    case 1798:
-    case 1799:
-    case 1780:
-    case 1781:
-    case 1782:
-    case 1783:
-    case 1784:
-    case 1785:
-    case 1786:
-    case 1787:
-    case 1788:
+    case 1788 ... 1793: // cmd group is off actions
       if(BIT_CHECK(currentStatus.testIO_hardware, 1))
-        {
           BIT_CLEAR(currentStatus.digIn, (cmdCombined-1793));
-        }
         // currentStatus.dev1 = BIT_CHECK(currentStatus.digIn, (cmdCombined-1793));
         // currentStatus.dev2 = BIT_CHECK(currentStatus.testIO_hardware, 1);
       break;  

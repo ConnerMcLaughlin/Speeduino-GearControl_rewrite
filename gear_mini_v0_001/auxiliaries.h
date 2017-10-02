@@ -4,13 +4,14 @@
 void selectorInput();
 void gearStatus();
 void gearOutput();
-void stepgear();
+void stepgear(byte);
 void driveOutputs();
-void outputaction(uint8_t chanX);
+void outputaction(byte chanX);
 void initialOutputs();
+void porteditorOutput();
 
   bool state;
   bool invstate;
-  uint8_t portX;
+  byte portX;
 
 #endif

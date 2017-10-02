@@ -10,7 +10,7 @@ void initialiseADC()
      BIT_CLEAR(ADCSRA,ADPS0); 
 }
 
-void readAnalog(uint8_t AinCH)
+void readAnalog(byte AinCH)
 {
     tempReading = analogRead( pinAin[AinCH]);   //read the adc channel
     tempReading = analogRead( pinAin[AinCH]);   //read it a second time to get a more stable /faster read
@@ -18,23 +18,19 @@ void readAnalog(uint8_t AinCH)
     
 }
 
-void readDigitalIn(uint8_t DinCH)
+void readDigitalIn(byte DinCH)
 {
   byte pinread = 0;
   pinread = digitalRead(pinIn[DinCH]);
   if ( pinread == 1)
-    {
       BIT_SET(currentStatus.digIn, (DinCH-1));
-    }
   else
-    {  
       BIT_CLEAR(currentStatus.digIn, (DinCH-1));    
-    }
     
 //currentStatus.IO  
 }
 
-void getAnalogBYoffset(uint8_t AinCH, uint8_t readloop)
+void getAnalogBYoffset(byte AinCH, byte readloop)
 {
          switch (AinCH)
               {

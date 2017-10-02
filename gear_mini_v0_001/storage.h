@@ -5,8 +5,8 @@
 
 void writeConfig();
 void loadConfig();
-uint8_t NVMEMread(uint16_t address);
-void NVMEMwrite(uint16_t address, uint8_t dataByte);
+byte NVMEMread(uint16_t address);
+void NVMEMwrite(uint16_t address, byte dataByte);
 
 /*
 Current layout of EEPROM data (Version 1) is as follows (All sizes are in bytes):

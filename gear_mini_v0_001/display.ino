@@ -1,18 +1,18 @@
-void configure_display_type()
-{
+//void configure_display_type()
+//{
   //  currentStatus.dev1 = configPage1.display_type & B00011111;
     
   //   switch (configPage1.display_type & B00011111)
   //  {
   //    case 0:
-          u8g2_0.begin();  
+  //        u8g2_0.begin();  
   //    break;
 
   //    case 1:
         //u8g2_1.begin();
   //    break;
   //  }     
-}
+//}
 
 void update_display()
 {  

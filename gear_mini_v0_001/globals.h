@@ -18,7 +18,8 @@
   #define USE_FRAM 1
   #define USE_EXT_FLASH 0
   
-  inline unsigned char  digitalPinToInterrupt(unsigned char Interrupt_pin) { return Interrupt_pin; } //This isn't included in the stm32duino libs (yet)
+  inline byte digitalPinToInterrupt(byte Interrupt_pin) 
+     return Interrupt_pin; //This isn't included in the stm32duino libs (yet)
   #define portOutputRegister(port) (volatile byte *)( &(port->regs->ODR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
   #define portInputRegister(port) (volatile byte *)( &(port->regs->IDR) ) //These are defined in STM32F1/variants/generic_stm32f103c/variant.h but return a non byte* value
   
@@ -86,11 +87,11 @@ this is 1 byte long.
 if you set realtime_bytes = 2
 then you will also be sent offset 9 too which is currentStatus.O2
  */
-const unsigned char simple_remote_signature[]    = "speeduino_GearControl 201709"; 
-const unsigned char simple_remote_RevNum[] = "speeduino 201709-GearControl V0.001";
-uint8_t thistsCanId = 4;    // this is the tunerstudio canId of this device
-const uint8_t data_structure_version = 2; //This identifies the data structure when reading / writing.
-const uint8_t page_1_size = 128;
+const byte simple_remote_signature[]    = "speeduino_GearControl 201709"; 
+const byte simple_remote_RevNum[] = "speeduino 201709-GearControl V0.001";
+byte thistsCanId = 4;    // this is the tunerstudio canId of this device
+const byte data_structure_version = 2; //This identifies the data structure when reading / writing.
+const byte page_1_size = 128;
 const uint16_t page_2_size = 256;
 
 //Handy bitsetting macros
@@ -101,18 +102,18 @@ const uint16_t page_2_size = 256;
 //The status struct contains the current values for all 'live' variables
 //In current version this is x bytes
 struct statuses {
-  volatile byte secl; //Continous
-  volatile byte systembits ;
-  volatile unsigned int loopsPerSecond ;
- volatile  uint16_t freeRAM ;
- volatile uint8_t currentPage;
- volatile uint8_t testIO_hardware;
-// uint8_t digInState[16];             //0 is off else on(set by direct pin read or interupts)
+ volatile byte secl; //Continous
+ volatile byte systembits ;
+ volatile uint16_t loopsPerSecond ;
+ volatile uint16_t freeRAM ;
+ volatile byte currentPage;
+ volatile byte testIO_hardware;
+// byte digInState[16];             //0 is off else on(set by direct pin read or interupts)
  uint16_t currentInputvalue[2];      //holds the analog input value for each conditional input , [0] first condition and [1] holds the second
  uint16_t currentInputvalueCond[3];  //holds the input test condition flags for each test condition , [0] holds first, [1] holds the second and [2] holds the total pass
- uint8_t condition_pass[48];          // array stores pass/fail flags for the one or two(if selected) condition checks
- uint8_t condition_pass_last[48];     // array stores pass/fail flags for the one or two(if selected) condition checks
- uint8_t OutputPort[16];             //output port condition status flags
+ byte condition_pass[48];          // array stores pass/fail flags for the one or two(if selected) condition checks
+ byte condition_pass_last[48];     // array stores pass/fail flags for the one or two(if selected) condition checks
+ byte OutputPort[16];             //output port condition status flags
  volatile uint16_t digOut;
  volatile uint16_t digOut_Active; // bits show if channel is used by board selected when pin value is > 0
  volatile uint16_t digOut_2;
@@ -121,17 +122,17 @@ struct statuses {
  volatile uint16_t digIn_Active;
  volatile uint16_t Analog[16];
  volatile uint16_t Analog_Active;
- volatile uint8_t change_up_current;
- volatile uint8_t change_up_last;
- volatile uint8_t change_down_current;
- volatile uint8_t change_down_last;
- volatile uint8_t manual_changed;
- volatile uint8_t auto_changed;
- volatile uint8_t GearNow;                  // the numeric gear when forward ie 1-8
- volatile uint8_t current_gear_Status = 0;      //the actual gear the box is in
- volatile uint8_t old_gear_Status = 1;          //the last actual gear the box was in
- volatile uint8_t current_gear_Selected = 0;    //the gear selected by the lever
- volatile uint8_t old_gear_Selected = 1;       //the last gear selected by the lever
+ volatile byte change_up_current;
+ volatile byte change_up_last;
+ volatile byte change_down_current;
+ volatile byte change_down_last;
+ volatile byte manual_changed;
+ volatile byte auto_changed;
+ volatile byte GearNow;                  // the numeric gear when forward ie 1-8
+ volatile byte current_gear_Status = 0;      //the actual gear the box is in
+ volatile byte old_gear_Status = 1;          //the last actual gear the box was in
+ volatile byte current_gear_Selected = 0;    //the gear selected by the lever
+ volatile byte old_gear_Selected = 1;       //the last gear selected by the lever
   
  volatile uint16_t dev1;
  volatile uint16_t dev2;
@@ -153,62 +154,62 @@ byte unused6;
 byte unused7;
 byte unused8;
 //byte unused9;
-uint8_t GearActive;       // flags for gears in use by gearbox selected
+byte GearActive;       // flags for gears in use by gearbox selected
 uint16_t DoutchanActive; // digital outputchannels 1-16 active flags
 uint16_t DoutchanActive_2; // digital output channels 17-32 active flags
 uint16_t DinchanActive; // digital input channels 1-16 active flags
 uint16_t DinchanActive_2; // digital input channels 17-32 active flags
 uint16_t AinchanActive; // analog input channels 1-16 active flags
 uint16_t AinchanActive_2; // analog  input channels 17-32 active flags
-uint8_t shiftsolenoid_1  ;              //pinout assigned to the solenoid (bits 0-4)
-//uint8_t shiftsolenoid_1_activestate;    //is solenoid output active low/high (bit 5 of shiftsolenoid_1)
-uint8_t shiftsolenoid_2  ;//       
-uint8_t shiftsolenoid_3  ;//      
-uint8_t shiftsolenoid_4  ;//      
-uint8_t shiftsolenoid_5  ;//       
-uint8_t shiftsolenoid_6  ;//        
-uint8_t shiftsolenoid_7  ;//        
-uint8_t shiftsolenoid_8  ;//        
-uint8_t lockup_solenoid_1  ;//  
-uint8_t lockup_solenoid_2  ;// 
-uint8_t starter_inhibit_out  ;
-uint8_t boxOutput_11  ;
-uint8_t boxOutput_12 ;
-uint8_t boxOutput_13 ;
-uint8_t boxOutput_14 ;
-uint8_t boxOutput_15 ;
-uint8_t boxOutput_16 ;
-uint8_t boxOutput_17 ;
-uint8_t boxOutput_18 ;
-uint8_t boxOutput_19 ;
-uint8_t boxOutput_20 ;
-uint8_t boxOutput_21 ;
-uint8_t boxOutput_22 ;
-uint8_t boxOutput_23 ;
-uint8_t boxOutput_24 ;
-uint8_t boxOutput_25 ;
-uint8_t boxOutput_26 ;
-uint8_t boxOutput_27 ;
-uint8_t boxOutput_28 ;
-uint8_t boxOutput_39 ;
-uint8_t boxOutput_30 ;
-uint8_t boxOutput_31 ;
-uint8_t change_up       ;//   = bits,   U08,    30,     [0:3] ,   $IN_PORT_NUMBERS
-uint8_t change_down      ;//  = bits,   U08,    31,     [0:3] ,   $IN_PORT_NUMBERS
-uint8_t park_in         ;//   = bits,   U08,    32,     [0:3] ,   $IN_PORT_NUMBERS
-uint8_t reverse_in      ;//   = bits,   U08,    33,     [0:3] ,   $IN_PORT_NUMBERS
-uint8_t neutral_in     ;//    = bits,   U08,    34,     [0:3] ,   $IN_PORT_NUMBERS
-uint8_t drive_in       ;//    
-uint8_t gear1_in       ;//    
-uint8_t gear2_in       ;//  
-uint8_t gear3_in       ;//   
-uint8_t gear4_in       ;//    
-uint8_t gear5_in       ;//   
-uint8_t gear6_in       ;//   
-uint8_t gear7_in       ;//   
-uint8_t gear8_in       ;//   
-uint8_t lockup_overide   ;//   = bits,      [0:3] ,   $IN_PORT_NUMBERS
-uint8_t gearbox_type  ;
+byte shiftsolenoid_1  ;              //pinout assigned to the solenoid (bits 0-4)
+//byte shiftsolenoid_1_activestate;    //is solenoid output active low/high (bit 5 of shiftsolenoid_1)
+byte shiftsolenoid_2  ;//       
+byte shiftsolenoid_3  ;//      
+byte shiftsolenoid_4  ;//      
+byte shiftsolenoid_5  ;//       
+byte shiftsolenoid_6  ;//        
+byte shiftsolenoid_7  ;//        
+byte shiftsolenoid_8  ;//        
+byte lockup_solenoid_1  ;//  
+byte lockup_solenoid_2  ;// 
+byte starter_inhibit_out  ;
+byte boxOutput_11  ;
+byte boxOutput_12 ;
+byte boxOutput_13 ;
+byte boxOutput_14 ;
+byte boxOutput_15 ;
+byte boxOutput_16 ;
+byte boxOutput_17 ;
+byte boxOutput_18 ;
+byte boxOutput_19 ;
+byte boxOutput_20 ;
+byte boxOutput_21 ;
+byte boxOutput_22 ;
+byte boxOutput_23 ;
+byte boxOutput_24 ;
+byte boxOutput_25 ;
+byte boxOutput_26 ;
+byte boxOutput_27 ;
+byte boxOutput_28 ;
+byte boxOutput_39 ;
+byte boxOutput_30 ;
+byte boxOutput_31 ;
+byte change_up       ;//   = bits,   U08,    30,     [0:3] ,   $IN_PORT_NUMBERS
+byte change_down      ;//  = bits,   U08,    31,     [0:3] ,   $IN_PORT_NUMBERS
+byte park_in         ;//   = bits,   U08,    32,     [0:3] ,   $IN_PORT_NUMBERS
+byte reverse_in      ;//   = bits,   U08,    33,     [0:3] ,   $IN_PORT_NUMBERS
+byte neutral_in     ;//    = bits,   U08,    34,     [0:3] ,   $IN_PORT_NUMBERS
+byte drive_in       ;//    
+byte gear1_in       ;//    
+byte gear2_in       ;//  
+byte gear3_in       ;//   
+byte gear4_in       ;//    
+byte gear5_in       ;//   
+byte gear6_in       ;//   
+byte gear7_in       ;//   
+byte gear8_in       ;//   
+byte lockup_overide   ;//   = bits,      [0:3] ,   $IN_PORT_NUMBERS
+byte gearbox_type  ;
 
 uint16_t FunctionActive; // function active flags 1-16
 uint16_t FunctionActive_2; // function active flags 17-32
@@ -241,10 +242,10 @@ byte unused96;
 byte unused97;
 byte unused98;
 byte unused99;
-uint8_t display_type;
-uint8_t manual_auto_status;
-uint8_t unused102;
-uint8_t unused103;
+byte display_type;
+byte manual_auto_status;
+byte unused102;
+byte unused103;
 byte unused104;
 byte unused105;
 byte unused106;
@@ -275,17 +276,17 @@ byte unused127 = 227;
 //this is laid out as first the byte size data then the words
 
 struct __attribute__ ( ( packed ) ) config2 {
-  uint8_t    port_Enabled[16];                // 1 if enabled 0 if not
-  uint8_t    port_Condition[16];              // < is 60, = is 61, > is 62, & is 38
-  uint8_t    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
-  uint8_t    port_InitValue[16];              // 1 on 0 off
-  uint8_t    port_PortValue[16];              // 1 if active high 0 if active low
-  uint8_t    port_OutSize[16];                // unsure of purpose but must be present
+  byte    port_Enabled[16];                // 1 if enabled 0 if not
+  byte    port_Condition[16];              // < is 60, = is 61, > is 62, & is 38
+  byte    port_Condition_relationship[16]; // none is 32 , OR is 124 , AND is 38 , NOT(!) is 33  
+  byte    port_InitValue[16];              // 1 on 0 off
+  byte    port_PortValue[16];              // 1 if active high 0 if active low
+  byte    port_OutSize[16];                // unsure of purpose but must be present
   uint16_t   port_OutOffset[16];              // port offset refers to the offset value from the output channels
   uint16_t    port_Threshold[16];              // threshhold value for on/off
   uint16_t    port_Hysteresis[16];             // hysteresis value for on/off
-  uint8_t    port_CanId[16];                  // TScanid of the device the output channel is from  
-  uint8_t    gear_port_Enabled2[16];                // 1 if enabled 0 if not
+  byte    port_CanId[16];                  // TScanid of the device the output channel is from  
+  byte    gear_port_Enabled2[16];                // 1 if enabled 0 if not
   //byte unused2_208;
 //byte unused2_209;
 //byte unused2_210;
@@ -345,17 +346,17 @@ byte pinAin[17]; //analog inputs
 
 // declare gearbox config parameters
 
-volatile uint8_t shiftsolenoid[9];     //8 shiftsolenoid (0 is not used) , set to 1 if used, 100 for pwm ,255 if unused
+volatile byte shiftsolenoid[9];     //8 shiftsolenoid (0 is not used) , set to 1 if used, 100 for pwm ,255 if unused
 volatile byte lockup_solenoid[3];      // 2 lockup solenoid (0 not used) , set to 1 if used, 100 for pwm ,255 if unused
-volatile uint8_t starter_inhibit;       //used or not by gearbox(1 or 255)
-volatile uint8_t boxOutput[33] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};        // holds board output port values aligned to gearbox outputs , eg boxOutput[1] == configPage1.shiftsolenoid_1
-volatile uint8_t spareOut[33];         // 33 spare outputs(making 32 outputs in total as 0 is not used)
-volatile uint8_t gear_port_Enabled[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ;  // range is [1] to [16] , 0 is not used
-volatile uint16_t inpin2binary[17] = {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768};  //this converts a pin bit location to the binary value of the bit in the input array
-volatile uint8_t gear[9];                 // 8 gears (0 not used)
-volatile uint8_t rev_gear;
+volatile byte starter_inhibit;       //used or not by gearbox(1 or 255)
+volatile byte boxOutput[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};        // holds board output port values aligned to gearbox outputs , eg boxOutput[1] == configPage1.shiftsolenoid_1
+volatile byte spareOut[33];// 33 spare outputs(making 32 outputs in total as 0 is not used)
+volatile byte gear_port_Enabled[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ;  // range is [1] to [16] , 0 is not used
+volatile uint16_t inpin2binary[] = {1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768};  //this converts a pin bit location to the binary value of the bit in the input array
+volatile byte gear[9];                 // 8 gears (0 not used)
+volatile byte rev_gear;
 
-volatile uint8_t activestate[32] ;      //set via bit 5 on bootup, 0 == active low pin 1 == active high pin
+volatile byte activestate[32] ;      //set via bit 5 on bootup, 0 == active low pin 1 == active high pin
 
 
 // global variables // from passthrough_example.ino
