@@ -135,58 +135,40 @@ void porteditorOutput()
             if ((configPage2.port_OutOffset[portX] == 13) ||(configPage2.port_OutOffset[portX] == 14))
               {
                if (currentStatus.digIn & configPage2.port_Threshold[portX])
-                  {
                    currentStatus.condition_pass[portX] = 1;  //set status to pass
-
-                  }
               else
-                  {
                    currentStatus.condition_pass[portX] = 0;  //set status to pass
-                   
-                  }
               }                    
                     break;
                     
                     case 60:
                     //< condition
                      offValue2 = (configPage2.port_Threshold[portX] + configPage2.port_Hysteresis[portX]); 
-                     if (offValue2 >= 1024 ){ offValue2 = 1024;}
-
+                     if (offValue2 >= 1024)
+                         offValue2 = 1024;
                      if (currentStatus.currentInputvalue[checkcondloop] < configPage2.port_Threshold[portX])
-                        {
                          currentStatus.condition_pass[portX] = 1;  //set status to pass
-                        }
- 
                      if (currentStatus.currentInputvalue[checkcondloop] >= offValue2) 
-                        {                         
                          currentStatus.condition_pass[portX] = 0;  //set status to off (threshold+hysteresis)
-                        }
        
                     break;
 
                     case 61:
                     //= condition
                     offValue1 = (configPage2.port_Threshold[portX] - configPage2.port_Hysteresis[portX]);
-                    if (offValue1 <= 0 ){offValue1 = 0;}
+                    if (offValue1 <= 0 )
+                        offValue1 = 0;
                     offValue2 = (configPage2.port_Threshold[portX] + configPage2.port_Hysteresis[portX]);
-                    if (offValue2 >= 1024 ){ offValue2 = 1024;}
-                    
+                    if (offValue2 >= 1024 )
+                        offValue2 = 1024;
                     if (currentStatus.currentInputvalue[checkcondloop] == configPage2.port_Threshold[portX])
-                        {
-                             currentStatus.condition_pass[portX] = 1;  //set status to pass
-                        }
-               else if (currentStatus.condition_pass[portX] == 1)
-                        {
-                         if (currentStatus.currentInputvalue[checkcondloop] < offValue1)  
-                            {
+                        currentStatus.condition_pass[portX] = 1;  //set status to pass
+                    else if (currentStatus.condition_pass[portX] == 1){
+                        if (currentStatus.currentInputvalue[checkcondloop] < offValue1)  
                              currentStatus.condition_pass[portX] = 0; // set status to fail (threshold-hysteresis)
-                            }
-                    else if (currentStatus.currentInputvalue[checkcondloop] > offValue2)  
-                            {
+                        else if (currentStatus.currentInputvalue[checkcondloop] > offValue2)  
                              currentStatus.condition_pass[portX] = 0; // set status to fail (threshold+hysteresis)
-                            }
-                         }
-  
+                    }
                     break;
 
                     case 62:
@@ -196,9 +178,9 @@ void porteditorOutput()
                        offValue1 = 0;
       
                     if (currentStatus.currentInputvalue[checkcondloop] > configPage2.port_Threshold[portX])
-                         currentStatus.condition_pass[portX] = 1;  //set status to pass
+                       currentStatus.condition_pass[portX] = 1;  //set status to pass
                     if (currentStatus.currentInputvalue[checkcondloop] <= offValue1) // has it dropped below the hys
-                         currentStatus.condition_pass[portX] = 0;  //set status to off (threshold+hysteresis)
+                       currentStatus.condition_pass[portX] = 0;  //set status to off (threshold+hysteresis)
                     break;                    
                     
                     } //ends the switch case 
@@ -206,11 +188,11 @@ void porteditorOutput()
 
 void selectorInput()
 {
-  currentStatus.current_gear_Selected = 0;
+  //currentStatus.current_gear_Selected = 0;
   //first check lever position
   if (currentStatus.digIn == 0)
         currentStatus.current_gear_Selected = 80;
-      //  currentStatus.current_gear_Status = 80;
+      //  no selector switch is active so error
   else
       {      
         if (BIT_CHECK(currentStatus.digIn,(configPage1.park_in & B00011111)) ==  inpin2binary[configPage1.park_in & B00011111])
@@ -218,78 +200,73 @@ void selectorInput()
       
         else if (BIT_CHECK(currentStatus.digIn,(configPage1.neutral_in & B00011111)) ==  inpin2binary[configPage1.neutral_in & B00011111])
           {
-            if((currentStatus.current_gear_Selected) && ((configPage1.park_in & B00011111) != (configPage1.neutral_in & B00011111)))
+    /*      if((currentStatus.current_gear_Selected) && ((configPage1.park_in & B00011111) != (configPage1.neutral_in & B00011111)))
                 currentStatus.current_gear_Selected = 80;                
             else
-                currentStatus.current_gear_Selected = 10;
+*/                currentStatus.current_gear_Selected = 10;
           }
-      
+                
         else if  (BIT_CHECK(currentStatus.digIn,(configPage1.drive_in & B00011111)) ==  inpin2binary[configPage1.drive_in & B00011111])      //
           {
-            if(currentStatus.current_gear_Selected)
+        /*    if(currentStatus.current_gear_Selected)
                 currentStatus.current_gear_Selected = 80;                
             else
-                currentStatus.current_gear_Selected = 20;
+   */             currentStatus.current_gear_Selected = 20;
           }
       
         else if (BIT_CHECK(currentStatus.digIn, (configPage1.reverse_in & B00011111)) == inpin2binary[configPage1.reverse_in & B00011111])
           {
-            if(currentStatus.current_gear_Selected)
+       /*     if(currentStatus.current_gear_Selected)
                 currentStatus.current_gear_Selected = 80;                
             else
-                currentStatus.current_gear_Selected = 30;
+        */        currentStatus.current_gear_Selected = 30;
           }
 
         else if ((configPage1.gear1_in) && (gear[1] < 255)&&(BIT_CHECK(currentStatus.digIn,(((configPage1.gear1_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear1_in)-1) & B00011111]))
               {
-               if(currentStatus.current_gear_Selected)
+       /*        if(currentStatus.current_gear_Selected)
                    currentStatus.current_gear_Selected = 80;               
                else
-                   currentStatus.current_gear_Selected = 1;
+         */          currentStatus.current_gear_Selected = 1;
               }   
           
         else if ((configPage1.gear2_in) && (gear[2] < 255) && (BIT_CHECK(currentStatus.digIn, (((configPage1.gear2_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear2_in)-1) & B00011111]))
               {
-               if(currentStatus.current_gear_Selected)
+         /*      if(currentStatus.current_gear_Selected)
                    currentStatus.current_gear_Selected = 80;                
               else
-                   currentStatus.current_gear_Selected = 2;
+          */         currentStatus.current_gear_Selected = 2;
               }   
                 
         else if ((configPage1.gear3_in) && (gear[3] < 255)&&(BIT_CHECK(currentStatus.digIn, (((configPage1.gear3_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear3_in)-1) & B00011111]))
               {
-               if(currentStatus.current_gear_Selected)
+           /*    if(currentStatus.current_gear_Selected)
                    currentStatus.current_gear_Selected = 80;                
               else                  
-                    currentStatus.current_gear_Selected = 3;
+            */        currentStatus.current_gear_Selected = 3;
               }    
               
         else if ((configPage1.gear4_in) && (gear[4] < 255)&& (BIT_CHECK(currentStatus.digIn, (((configPage1.gear4_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear4_in)-1) & B00011111]))
               {
-               if(currentStatus.current_gear_Selected)
+            /*   if(currentStatus.current_gear_Selected)
                    currentStatus.current_gear_Selected = 80;                
               else
-                    currentStatus.current_gear_Selected = 4;
+             */       currentStatus.current_gear_Selected = 4;
               }   
               
-        else if ((configPage1.gear5_in) && (gear[5] < 255))   
-            {
-              if (BIT_CHECK(currentStatus.digIn, (((configPage1.gear5_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear5_in)-1) & B00011111])
+        else if ((configPage1.gear5_in) && (gear[5] < 255) && (BIT_CHECK(currentStatus.digIn, (((configPage1.gear5_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear5_in)-1) & B00011111]))
               {
-               if(currentStatus.current_gear_Selected)
+          /*     if(currentStatus.current_gear_Selected)
                    currentStatus.current_gear_Selected = 80;                
               else
-                    currentStatus.current_gear_Selected = 5;
-              }    
+           */         currentStatus.current_gear_Selected = 5;
+            //  }    
             }  
-        else if (gear[6] < 255)            
-              if (BIT_CHECK(currentStatus.digIn, (((configPage1.gear6_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear6_in)-1) & B00011111])
+        else if (configPage1.gear6_in && (gear[6] < 255) && (BIT_CHECK(currentStatus.digIn, ((configPage1.gear6_in - 1) & B00011111)) == inpin2binary[(configPage1.gear6_in - 1) & B00011111]))
                   currentStatus.current_gear_Selected = 6;
-        else if (gear[7] < 255)
-              if (BIT_CHECK(currentStatus.digIn, (((configPage1.gear7_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear7_in)-1) & B00011111])             
+        else if (configPage1.gear7_in && (gear[7] < 255) && (BIT_CHECK(currentStatus.digIn, (((configPage1.gear7_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear7_in)-1) & B00011111]))
                   currentStatus.current_gear_Selected = 7;
-        else if (gear[8] < 255)
-              if (BIT_CHECK(currentStatus.digIn, (((configPage1.gear8_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear8_in)-1) & B00011111])
+        else if (configPage1.gear8_in && (gear[8] < 255) && (BIT_CHECK(currentStatus.digIn, (((configPage1.gear8_in)-1)  & B00011111)) ==  inpin2binary[((configPage1.gear8_in)-1) & B00011111]))
                   currentStatus.current_gear_Selected = 8;     
        // else if (currentStatus.current_gear_Selected == 0)                                                //input is in error code80
         else        //selection error
@@ -321,7 +298,7 @@ void gearOutput()
           break;
           
           case 10:    //neutral
-                currentStatus.digOut = 0;
+                currentStatus.digOut = 0;//reset all outputs
                  BIT_SET(currentStatus.digOut,((boxOutput[10])-1));   //enable starter
           break;
 
@@ -430,12 +407,14 @@ void gearStatus()
           case 20:  //drive
                if ((currentStatus.current_gear_Status == 10) || ((currentStatus.current_gear_Status >= 1)&&(currentStatus.current_gear_Status <=8)) || (currentStatus.current_gear_Status == 80) )
                   {
-                    if (!configPage1.manual_auto_status)      //if set to manual 
+                    if (!configPage1.manual_auto_status){      // if set to manual 
                           if (!currentStatus.manual_changed)   // if a manual change has NOT occurred
                                 currentStatus.current_gear_Status = 20;
-               else if (configPage1.manual_auto_status == 1)      //if set to auto      
+                    }
+               else if (configPage1.manual_auto_status == 1){    // if set to auto      
                           if (currentStatus.auto_changed == 0)   // if a auto change has NOT occurred
                                 currentStatus.current_gear_Status = 20;
+                          }
                   } 
           break;
 
@@ -473,7 +452,7 @@ void gearStatus()
                 }
             }      
 
-          if (configPage1.change_down != 0)       // if down paddle is activated
+          if (configPage1.change_down)       // if down paddle is activated
             {      
               if (BIT_CHECK(currentStatus.digIn, ((configPage1.change_down -1)  & B00011111)) == inpin2binary[(configPage1.change_down -1) & B00011111])
                 {
@@ -503,19 +482,19 @@ void gearStatus()
     }       // manual_auto_status == 0
     
     //now do lockup switching
-    currentStatus.dev1 = configPage1.lockup_overide;//the pinin from switch
+   /* currentStatus.dev1 = configPage1.lockup_overide;//the pinin from switch
     currentStatus.dev2 = boxOutput[8];// the pinout the lockup1 solenoid is on
-   
+   */
     if (configPage1.lockup_overide)    //if lockup override is enabled
       {
         if (BIT_CHECK(currentStatus.digIn, ((configPage1.lockup_overide -1)  & B00011111)) == inpin2binary[(configPage1.lockup_overide -1) & B00011111])  //if the input pin is active
           {
-            currentStatus.dev3 = 33; 
+    //        currentStatus.dev3 = 33; 
             BIT_SET(currentStatus.digOut,((boxOutput[8])-1));
           }
         else
           {
-            currentStatus.dev3 = 44;
+     //       currentStatus.dev3 = 44;
             BIT_CLEAR(currentStatus.digOut,((boxOutput[8])-1));                                
           }
       }    

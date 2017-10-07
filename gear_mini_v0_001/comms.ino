@@ -67,7 +67,7 @@ void do_rCommands(byte commandletter, byte canid, uint16_t cmdoffset, uint16_t c
            
            case 134:  //
                     SERIALLink.print("r");
-                    SERIALLink.write(thistsCanId);              //canId of the device you are requesting data from
+                    SERIALLink.write(canid);              //canId of the device you are requesting data from
                     SERIALLink.write(134);                     //0x0E+128dec = 0x8E
                     SERIALLink.write(zero);                       // dummy offset lsb
                     SERIALLink.write(zero);                       // dummy offset msb
@@ -83,7 +83,7 @@ void do_rCommands(byte commandletter, byte canid, uint16_t cmdoffset, uint16_t c
            case 135:    //
            Serial.print("reply135");
                     SERIALLink.print("r");
-                    SERIALLink.write(thistsCanId);              //canId of the device you are requesting data from
+                    SERIALLink.write(canid);              //canId of the device you are requesting data from
                     SERIALLink.write(135);                     //0x0F+128dec = 0x8F
                     SERIALLink.write(zero);                       // dummy offset lsb
                     SERIALLink.write(zero);                       // dummy offset msb
@@ -112,7 +112,7 @@ void do_rCommands(byte commandletter, byte canid, uint16_t cmdoffset, uint16_t c
            break;
           
            case 206:  //r version of V == dec86+120 == 206
-                  direct_sendPage(cmdlength,thistsCanId,206);
+                  direct_sendPage(cmdlength,canid,206);
            break;
                     
            case 207:  //r version of W(87dec)+120 == 207
@@ -183,7 +183,7 @@ void sendPage(uint16_t send_page_Length,bool useChar, byte can_id)
     
           //All other bytes can simply be copied from the config table
           SERIALLink.print("r");
-          SERIALLink.write(thistsCanId);                //canId of the device you are requesting data from
+          SERIALLink.write(can_id);                //canId of the device you are requesting data from
           SERIALLink.write(0xCE);                       //0x56+120dec = 0xCE  
           SERIALLink.write(zero);                       // dummy offset lsb
           SERIALLink.write(zero);                       // dummy offset msb

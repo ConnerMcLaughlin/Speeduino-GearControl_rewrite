@@ -252,14 +252,18 @@ byte unused106;
 byte unused107;
 byte unused108;
 byte unused109;
-byte unused110;
+uint16_t pulse_per_mile;
+uint16_t final_drive_ratio;        //ratio * 1000
+uint16_t tyre_diameter;            //diameter * 100
+uint16_t number_wheel_impulses;    //Vss pulse/rev
+/*byte unused110;
 byte unused111;
 byte unused112;
 byte unused113;
 byte unused114;
 byte unused115;
 byte unused116;
-byte unused117;
+byte unused117;*/
 byte unused118;
 byte unused119;
 byte unused120 = 200;

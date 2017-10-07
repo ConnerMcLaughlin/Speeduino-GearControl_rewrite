@@ -67,16 +67,12 @@ void oneMSInterval() //Most ARM chips can simply call a function
   //Loop executed every 100ms loop
   //Anything inside this if statement will run every 100ms.
   if (loop100ms == 100)
-  {
     loop100ms = 0; //Reset counter
-  }
 
   //Loop executed every 250ms loop (1ms x 250 = 250ms)
   //Anything inside this if statement will run every 250ms.
   if (loop250ms == 250)
-  {
     loop250ms = 0; //Reset Counter.
-  }
 
   //Loop executed every 1 second (1ms x 1000 = 1000ms)
   if (loopSec == 1000)

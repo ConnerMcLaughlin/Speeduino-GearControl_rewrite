@@ -247,7 +247,7 @@ void direct_sendPage(uint16_t send_page_Length, byte can_id, byte cmd)
           if (cmd == 206)   //came via passthrough from serial3
             {
               SERIALLink.print("r");
-              SERIALLink.write(thistsCanId);                //canId of the device you are requesting data from
+              SERIALLink.write(can_id);                //canId of the device you are requesting data from
               SERIALLink.write(cmd);                       //0x56+120dec = 0xCE  
               SERIALLink.write(zero);                       // dummy offset lsb
               SERIALLink.write(zero);                       // dummy offset msb
